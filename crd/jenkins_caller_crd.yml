@@ -1,0 +1,54 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: jenkinscallers.eaf.dev
+spec:
+  scope: Namespaced
+  group: eaf.dev
+  names:
+    kind: JenkinsCaller
+    plural: jenkinscallers
+    singular: jenkinscaller
+    shortNames:
+      - jec
+      - jcall
+      - jenk
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+              properties:
+                appid: 
+                  type: string
+                component: 
+                  type: string
+                jobname:
+                  type: string
+                jobparams:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+      additionalPrinterColumns:
+        - name: AppId
+          type: string
+          description: id of the owning app
+          jsonPath: .spec.appid
+        - name: JobName
+          type: string
+          description: name of the called job
+          jsonPath: .spec.jobname
+        # - name: JobParams
+        #   type: string
+        #   jsonPath: .spec.jobparams
+        - name: Status
+          type: string
+          jsonPath: .status.create_and_update_fn.message

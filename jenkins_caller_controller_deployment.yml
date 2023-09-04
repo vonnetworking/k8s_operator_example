@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins_caller-operator
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      application: jenkins_caller-operator
+  template:
+    metadata:
+      labels:
+        application: jenkins_caller-operator
+    spec:
+      serviceAccountName: sa
+      containers:
+      - name: jenkins_caller-operator_container
+        image: my-user/jenkins_caller-kopf-operator

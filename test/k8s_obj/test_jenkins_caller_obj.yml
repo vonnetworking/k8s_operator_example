@@ -1,0 +1,10 @@
+apiVersion: eaf.dev/v1
+kind: JenkinsCaller
+metadata:
+  name: my-caller      
+spec:
+  appid: "APP12"
+  jobname: devops/caller_test
+  jobparams:
+    msg: "Hello from obj"
+    msg2: "goodbye from obj"
