@@ -3,7 +3,8 @@ kind: JenkinsCaller
 metadata:
   name: my-caller      
 spec:
-  appid: "APP12"
+  appid: "app12"
+  component: "mydb"
   jobname: devops/caller_test
   jobparams:
     msg: "Hello from obj"
