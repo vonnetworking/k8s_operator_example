@@ -225,6 +225,230 @@ Based on the WSJF scores, the priority order for automation is:
 - Regularly review and update inputs (e.g., demand, business priorities, risk factors) to ensure decisions remain relevant.  
 - Use WSJF as a starting point but balance it with judgment and organizational context. For example, if backup automation is a key enabler for future processes, it might be prioritized despite its lower score.
 
+
+---
+
+
+**Designing Agentic Workflows in Generative AI: A Practical Guide**
+
+---
+
+### Introduction
+
+Generative AI is evolving quickly, and agentic workflows are becoming a key way to build systems that are more adaptive, interactive, and intelligent. These workflows let AI agents act more like collaborators: they can plan, use tools, fetch relevant data, and make decisions based on context. This guide introduces the core concepts behind agentic workflows and helps you choose the right architectural pattern for your specific business problem.
+
+---
+
+### Key Concepts in Agentic Workflows
+
+Before diving into architecture patterns, it's important to understand the common components that show up in agentic systems:
+
+* **Agent**: Think of this as your smart assistant. It can reason, plan, and take actions by calling tools or fetching information.
+* **Tool**: These are the utilities the agent can use—like a calculator, a database query handler, or a web search interface.
+* **Vector Store**: A special database that stores and retrieves text as embeddings (basically, semantic fingerprints). It helps the agent quickly find relevant info.
+* **RAG (Retrieval-Augmented Generation)**: This means the model grabs relevant info from external sources before generating an answer—kind of like reading before writing.
+* **Data Source**: Any system where information lives—APIs, files, databases, or websites—that the agent might tap into.
+* **LLM (Large Language Model)**: The brain of the operation. It understands language, reasons, and generates text.
+* **Memory**: A state store that helps agents remember previous interactions, facts, or steps taken—enabling continuity in longer workflows.
+* **Planner**: A specialized logic module or sub-agent that decomposes a problem into sequential tasks or goals.
+* **Executor**: A component or sub-agent responsible for carrying out the plan step-by-step.
+* **Critic / Evaluator**: An internal review mechanism that checks outputs for quality, correctness, or alignment with goals.
+
+---
+
+### Common Protocols and Guidelines
+
+To build cohesive, scalable agentic workflows, it helps to rely on a few emerging patterns and protocols that guide how components interact:
+
+#### 1. **RAG (Retrieval-Augmented Generation) Protocol**
+
+* **Purpose**: Supplies relevant context from external knowledge sources (especially vector stores) to the LLM at inference time.
+* **Typical Flow**:
+
+  * Input query is embedded.
+  * Vector store performs similarity search.
+  * Retrieved documents are used to augment the original query.
+  * LLM generates a response based on enriched context.
+* **Guidelines**:
+
+  * Use clear document chunking and metadata tagging.
+  * Filter and score retrieved data for relevance.
+  * Limit retrieval scope to maintain generation precision.
+
+#### 2. **A2A (Agent-to-Agent Communication)**
+
+* **Purpose**: Enables coordination and specialization across multiple agents.
+* **Typical Use**:
+
+  * Delegation of subtasks to domain-specific agents.
+  * Asynchronous or synchronous messaging with context handover.
+* **Guidelines**:
+
+  * Agents should use standardized message formats (e.g., structured task schemas).
+  * Context must be explicitly passed or stored in shared memory.
+  * Responsibility and authority should be clearly scoped per agent.
+
+#### 3. **MCP (Managed Capability Pattern)**
+
+* **Purpose**: Organizes and governs tool access across agents using a centralized registry.
+* **How It Works**:
+
+  * A manager component registers all available tools and defines access policies.
+  * Agents query the registry to find and invoke tools.
+  * Execution is tracked and optionally validated.
+* **Guidelines**:
+
+  * Define tools with clear input/output contracts.
+  * Use a capability ontology or tagging system for discoverability.
+  * Log usage for observability and debugging.
+
+These patterns help ensure modularity, reliability, and interoperability across large-scale agentic systems.
+
+---
+
+### Should You Use an Agentic Workflow?
+
+Here’s a quick way to decide if you need an agent or just a simple prompt:
+
+```
+            +----------------------------+
+            | Is the task simple and     |
+            | predictable?               |
+            +------------+--------------+
+                         |
+                    Yes  v
+                         [Use Simple Prompting or Basic Workflow]
+                         |
+                    No   v
+            +----------------------------+
+            | Does it involve decision- |
+            | making or external data?  |
+            +------------+--------------+
+                         |
+                    Yes  v
+                        [Use Agentic Workflow]
+```
+
+---
+
+### General Architecture of an Agentic Workflow
+
+Here's a high-level structure of how components in an agentic workflow typically interact, with key protocols indicated:
+
+```
+[User Input / Trigger]
+        |
+        v
+     [Agent]
+      / |  \ 
+     /  |   \ 
+[Planner] | [Memory] | [Critic / Evaluator]
+     |           |            |
+     v           v            v
+[Executor] <----> [Tool Use] <----> [Data Sources / APIs / DBs]
+     |       |                     
+     |       |-- via MCP --> [Tool Registry / Capabilities]
+     |                          
+     v                         
+[Context Retrieval via RAG Protocol] <--> [Vector Store]
+     |
+     v
+[LLM - Generation / Decision Output]
+     |
+     v
+[Final Output to User or Next System]
+```
+
+In a multi-agent scenario, components may also include:
+
+```
+[Agent A] <-- A2A Protocol --> [Agent B]
+```
+
+This architecture allows the agent to:
+
+* **Plan** its actions
+* **Execute** them with access to tools and external data
+* **Coordinate** with other agents when needed
+* **Reflect** and improve its results through memory and self-evaluation
+
+---
+
+### Common Agentic Workflow Patterns
+
+Depending on what you're trying to build, different agentic patterns make sense. Here are the most common ones:
+
+#### 1. **Single Agent with Tools**
+
+* **How it works**: One agent runs the show, calling tools when needed.
+* **When to use it**: If the task is moderately complex and needs a few tools or data sources.
+* **Example**: Creating a report using a spreadsheet and a document archive.
+
+#### 2. **Agent with RAG**
+
+* **How it works**: The agent fetches relevant data from a vector store before generating an answer.
+* **When to use it**: When context really matters and the data set is too large to include up front.
+* **Example**: Summarizing technical documents or tailoring product recommendations.
+
+#### 3. **Multi-Agent System**
+
+* **How it works**: Several agents, each with a specific role or skill, work together.
+* **When to use it**: For big, complex tasks that need multiple areas of expertise.
+* **Example**: A research team made of specialized bots, or a digital customer service workflow.
+
+#### 4. **Planner and Executor**
+
+* **How it works**: One agent figures out the steps; another follows them.
+* **When to use it**: When tasks need to be broken down and done in sequence.
+* **Example**: Analyzing multiple documents, cleaning the data, and generating a summary.
+
+#### 5. **Self-Reflecting Agent**
+
+* **How it works**: The agent checks its own work and revises if it’s not good enough.
+* **When to use it**: When accuracy is critical or quality needs to be high.
+* **Example**: Writing code, crafting detailed reports, or translating documents.
+
+---
+
+### Choosing the Right Architecture: A Simple Flow
+
+Use this flowchart to match the architecture to your task:
+
+```
+                          +----------------------------------------+
+                          | Is the task complex and multistep?     |
+                          +---------------------+------------------+
+                                                |
+                                           No   v
+                                                [Use Single Agent with Tools]
+                                                |
+                                           Yes  v
+                          +----------------------------------------+
+                          | Do you need to pull in outside info?   |
+                          +---------------------+------------------+
+                                                |
+                                           No   v
+                                                [Use Planner-Executor Pattern]
+                                                |
+                                           Yes  v
+                          +----------------------------------------+
+                          | Does it need multiple skill sets?      |
+                          +---------------------+------------------+
+                                                |
+                                           No   v
+                                                [Use Agent with RAG]
+                                                |
+                                           Yes  v
+                                                [Use Multi-Agent System (A2A)]
+```
+
+---
+
+### Final Thoughts
+
+Agentic workflows let you build smarter AI systems that can adapt, plan, and interact more like human collaborators. By understanding the components, adopting proven protocols, and choosing the right architectural pattern, you can build solutions that are not just functional—but flexible, scalable, and aligned with real-world needs.
+
+
 This structured approach helps ensure that automation efforts deliver the maximum value for the time and resources invested.
 
 By adopting a systems-thinking approach, IT service automation becomes more than just a toolset—it becomes an enabler of strategic goals, fostering alignment between service families, customers, and the broader organizational ecosystem.
